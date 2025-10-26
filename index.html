@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popik Radio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(145deg, #0a0a0a, #1e1e1e);
+      color: #fff;
+      text-align: center;
+      padding-top: 120px;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #ff0066;
+    }
+    input {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 5px;
+      background: #ff0066;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff3380;
+    }
+    #player {
+      display: none;
+      margin-top: 30px;
+    }
+    audio {
+      width: 300px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 Popik Radio</h1>
+  <p>Zadej heslo pro vstup:</p>
+  <input type="password" id="password" placeholder="Heslo">
+  <br>
+  <button onclick="checkPassword()">Ověřit</button>
+
+  <div id="player">
+    <h2>Živé vysílání 🎶</h2>
+    <audio controls autoplay>
+      <source src="http://popik-666.ismyradio.com/stream" type="audio/mpeg">
+      Tvůj prohlížeč nepodporuje přehrávání audia.
+    </audio>
+  </div>
+
+  <script>
+    function checkPassword() {
+      const pass = document.getElementById('password').value;
+      if (pass === '321456') {
+        document.getElementById('player').style.display = 'block';
+        document.querySelector('input').style.display = 'none';
+        document.querySelector('button').style.display = 'none';
+        document.querySelector('p').textContent = "Vítej v rádiu!";
+      } else {
+        alert('Špatné heslo!');
+      }
+    }
+  </script>
+</body>
+</html>
