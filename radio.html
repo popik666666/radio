@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Popik Rádio</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.container {
+  background: #141414;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 420px;
+}
+input, button {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  margin: 5px;
+}
+input {
+  width: 80%;
+}
+button {
+  background: #ff4d67;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+button:hover {
+  background: #ff6b84;
+}
+#adminBtn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #222;
+  border: 1px solid #444;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #fff;
+  border-radius: 6px;
+}
+audio {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 6px;
+}
+</style>
+</head>
+<body>
+<button id="adminBtn">Admin</button>
+
+<div class="container" id="loginBox">
+  <h2>🎧 Popik Rádio</h2>
+  <p>Zadej přístupový kód pro vstup</p>
+  <input type="password" id="accessCode" placeholder="Kód">
+  <button id="loginBtn">Přihlásit</button>
+</div>
+
+<div class="container" id="radioBox" style="display:none;">
+  <h2>Popik Rádio Live</h2>
+  <audio controls autoplay>
+    <source src="https://popik-666.ismyradio.com/stream" type="audio/mpeg">
+  </audio>
+  <p>🎶 Rádio běží živě!</p>
+</div>
+
+<div class="container" id="adminBox" style="display:none;">
+  <h2>👑 Admin panel</h2>
+  <input type="password" id="adminPass" placeholder="Admin heslo">
+  <button id="adminLogin">Odemknout</button>
+
+  <div id="changeBox" style="display:none;">
+    <input type="text" id="newCode" placeholder="Nový kód">
+    <button id="saveCode">Uložit nový kód</button>
+    <p style="font-size:13px; color:#999;">Nový kód se uloží pouze v tomto prohlížeči.</p>
+  </div>
+</div>
+
+<script>
+// Výchozí přístupový kód
+let accessCode = localStorage.getItem("radioCode") || "321456";
+const adminPassword = "p666pr";
+
+const loginBox = document.getElementById("loginBox");
+const radioBox = document.getElementById("radioBox");
+const adminBox = document.getElementById("adminBox");
+
+// Přihlášení uživatele
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const code = document.getElementById("accessCode").value;
+  if (code === accessCode) {
+    loginBox.style.display = "none";
+    radioBox.style.display = "block";
+  } else {
+    alert("❌ Nesprávný kód");
+  }
+});
+
+// Otevření admin panelu
+document.getElementById("adminBtn").addEventListener("click", () => {
+  adminBox.style.display = "block";
+  loginBox.style.display = "none";
+  radioBox.style.display = "none";
+});
+
+// Přihlášení admina
+document.getElementById("adminLogin").addEventListener("click", () => {
+  const pass = document.getElementById("adminPass").value;
+  if (pass === adminPassword) {
+    document.getElementById("changeBox").style.display = "block";
+  } else {
+    alert("❌ Špatné heslo admina");
+  }
+});
+
+// Změna kódu
+document.getElementById("saveCode").addEventListener("click", () => {
+  const newCode = document.getElementById("newCode").value.trim();
+  if (newCode.length < 3) {
+    alert("⚠️ Kód musí mít alespoň 3 znaky");
+    return;
+  }
+  accessCode = newCode;
+  localStorage.setItem("radioCode", accessCode);
+  alert("✅ Nový kód byl uložen: " + newCode);
+});
+</script>
+</body>
+</html>
