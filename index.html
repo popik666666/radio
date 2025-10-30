@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popik Radio Live</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 40px;
+      text-align: center;
+    }
+
+    #adminLoginBox {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+    }
+
+    input, button, textarea {
+      padding: 8px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      background: #0a84ff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .content-box, .admin-panel, .login-box {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 0 10px #000;
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    #infoPanel {
+      background: #333; 
+      padding: 10px; 
+      border-radius: 5px; 
+      min-height: 50px;
+    }
+
+    textarea {
+      width: 95%;
+      height: 80px;
+      resize: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 Popik Radio Live</h1>
+
+  <!-- Přihlášení posluchače -->
+  <div id="login" class="login-box">
+    <h3>Přihlášení pro posluchače</h3>
+    <input type="password" id="listenerPassword" placeholder="Zadej kód"><br>
+    <button onclick="listenerLogin()">Přihlásit</button>
+    <p id="listenerMsg"></p>
+  </div>
+
+  <!-- Přihlášení admina (jen jedno pole) -->
+  <div id="adminLoginBox">
+    <h4>Admin přihlášení</h4>
+    <input type="password" id="adminPassword" placeholder="Zadej admin kód"><br>
+    <button onclick="adminLogin()">Přihlásit</button>
+    <p id="adminMsg"></p>
+  </div>
+
+  <!-- Obsah pro posluchače -->
+  <div id="content" class="content-box" style="display:none; text-align:center;">
+    <h2>Vítej v Popik rádiu 🎶</h2>
+
+    <h3>🎵 Poslouchej rádio:</h3>
+    <audio controls autoplay>
+      <source src="https://popik-666.ismyradio.com/stream" type="audio/mpeg">
+      Tvůj prohlížeč nepodporuje přehrávání rádia.
+    </audio>
+
+    <h3>ℹ️ Informační panel:</h3>
+    <div id="infoPanel">
+      <p>Vítejte! Poslouchejte živé vysílání.</p>
+    </div>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="adminPanel" class="admin-panel" style="display:none;">
+    <h3>⚙️ Admin panel</h3>
+    <p>Aktuální kód pro posluchače: <span id="currentCode"></span></p>
+    <input type="text" id="newCode" placeholder="Nový kód">
+    <button onclick="changeCode()">Změnit kód</button>
+    <p id="codeMsg"></p>
+
+    <h3>📝 Správa info panelu:</h3>
+    <textarea id="adminMessage" placeholder="Zpráva pro posluchače..."></textarea><br>
+    <button onclick="updateInfo()">Aktualizovat info</button>
+    <button onclick="deleteInfo()">Smazat zprávu</button>
+    <p id="infoMsg"></p>
+  </div>
+
+  <script>
+    // Výchozí kód pro posluchače
+    let listenerCode = localStorage.getItem('listenerCode') || '321456';
+    document.getElementById('currentCode').textContent = listenerCode;
+
+    // Načtení info panelu
+    let infoText = localStorage.getItem('infoText') || 'Vítejte! Poslouchejte živé vysílání.';
+    document.getElementById('infoPanel').innerHTML = '<p>' + infoText + '</p>';
+
+    // Přihlášení posluchače
+    function listenerLogin() {
+      const pass = document.getElementById('listenerPassword').value.trim();
+      const msg = document.getElementById('listenerMsg');
+      if(pass === listenerCode){
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        msg.textContent = '';
+      } else {
+        msg.textContent = '❌ Nesprávný kód';
+      }
+    }
+
+    // Přihlášení admina
+    function adminLogin() {
+      const pass = document.getElementById('adminPassword').value.trim();
+      const msg = document.getElementById('adminMsg');
+
+      if(pass === 'p666pr'){
+        msg.textContent = '✅ Admin přihlášen';
+        showAdminPanel();
+      } else {
+        msg.textContent = '❌ Nesprávný admin kód';
+      }
+    }
+
+    function showAdminPanel() {
+      document.getElementById('content').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'block';
+    }
+
+    // Změna kódu posluchače
+    function changeCode() {
+      const newCode = document.getElementById('newCode').value.trim();
+      const codeMsg = document.getElementById('codeMsg');
+      if(newCode.length < 4){
+        codeMsg.textContent = '❌ Kód musí mít alespoň 4 znaky';
+        return;
+      }
+      listenerCode = newCode;
+      localStorage.setItem('listenerCode', newCode);
+      document.getElementById('currentCode').textContent = newCode;
+      codeMsg.textContent = '✅ Kód úspěšně změněn';
+    }
+
+    // Aktualizace info panelu
+    function updateInfo() {
+      const message = document.getElementById('adminMessage').value.trim();
+      const infoMsg = document.getElementById('infoMsg');
+      if(message.length === 0){
+        infoMsg.textContent = '❌ Zpráva nesmí být prázdná';
+        return;
+      }
+      localStorage.setItem('infoText', message);
+      document.getElementById('infoPanel').innerHTML = '<p>' + message + '</p>';
+      infoMsg.textContent = '✅ Info panel aktualizován';
+    }
+
+    // Smazání zprávy
+    function deleteInfo() {
+      localStorage.removeItem('infoText');
+      document.getElementById('infoPanel').innerHTML = '<p></p>';
+      document.getElementById('infoMsg').textContent = '✅ Zpráva smazána';
+    }
+  </script>
+</body>
+</html>
