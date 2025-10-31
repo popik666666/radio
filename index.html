@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popik Radio Live</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 40px;
+      text-align: center;
+    }
+
+    #adminKey {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      font-size: 28px;
+      cursor: pointer;
+      background: #222;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px #000;
+      transition: background 0.3s;
+    }
+
+    #adminKey:hover { background: #333; }
+
+    #adminLoginBox {
+      position: fixed;
+      top: 60px;
+      right: 10px;
+      background: #222;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+      display: none;
+      width: 180px;
+      text-align: center;
+    }
+
+    input, button, textarea { padding: 8px; margin: 5px; border: none; border-radius: 5px; }
+    button { background: #0a84ff; color: white; cursor: pointer; }
+
+    .content-box, .admin-panel, .login-box {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 0 10px #000;
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    #infoPanel {
+      background: #333; 
+      padding: 10px; 
+      border-radius: 5px; 
+      min-height: 50px;
+    }
+
+    textarea { width: 95%; height: 80px; resize: none; }
+  </style>
+</head>
+<body>
+  <h1>🎧 Popik Radio Live</h1>
+
+  <!-- Klíč pro admina -->
+  <div id="adminKey" onclick="toggleAdminLogin()">🔑</div>
+
+  <!-- Přihlášení admina -->
+  <div id="adminLoginBox">
+    <input type="password" id="adminPassword" placeholder="Admin kód"><br>
+    <button onclick="adminLogin()">OK</button>
+    <p id="adminMsg"></p>
+  </div>
+
+  <!-- Přihlášení posluchače -->
+  <div id="login" class="login-box">
+    <h3>Přihlášení pro posluchače</h3>
+    <input type="password" id="listenerPassword" placeholder="Zadej kód"><br>
+    <button onclick="listenerLogin()">Přihlásit</button>
+    <p id="listenerMsg"></p>
+  </div>
+
+  <!-- Obsah pro posluchače -->
+  <div id="content" class="content-box" style="display:none; text-align:center;">
+    <h2>Vítej v Popik rádiu 🎶</h2>
+
+    <h3>🎵 Poslouchej rádio:</h3>
+    <audio controls autoplay>
+      <source src="https://popik-666.ismyradio.com/stream" type="audio/mpeg">
+      Tvůj prohlížeč nepodporuje přehrávání rádia.
+    </audio>
+
+    <h3>ℹ️ Informační panel:</h3>
+    <div id="infoPanel">
+      <p>Vítejte! Poslouchejte živé vysílání.</p>
+    </div>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="adminPanel" class="admin-panel" style="display:none;">
+    <h3>⚙️ Admin panel</h3>
+    <button onclick="logoutAdmin()">Odhlásit admina</button>
+
+    <p>Aktuální kód pro posluchače: <span id="currentCode"></span></p>
+    <input type="text" id="newCode" placeholder="Nový kód">
+    <button onclick="changeCode()">Změnit kód</button>
+    <p id="codeMsg"></p>
+
+    <h3>📝 Správa info panelu:</h3>
+    <textarea id="adminMessage" placeholder="Zpráva pro posluchače..."></textarea><br>
+    <button onclick="updateInfo()">Aktualizovat info</button>
+    <button onclick="deleteInfo()">Smazat zprávu</button>
+    <p id="infoMsg"></p>
+  </div>
+
+  <script>
+    // Inicializace kódu a info
+    let listenerCode = localStorage.getItem('listenerCode') || '321456';
+    document.getElementById('currentCode').textContent = listenerCode;
+
+    let infoText = localStorage.getItem('infoText') || 'Vítejte! Poslouchejte živé vysílání.';
+    document.getElementById('infoPanel').innerHTML = '<p>' + infoText + '</p>';
+
+    function toggleAdminLogin() {
+      const box = document.getElementById('adminLoginBox');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function listenerLogin() {
+      const pass = document.getElementById('listenerPassword').value.trim();
+      const msg = document.getElementById('listenerMsg');
+      if(pass === listenerCode){
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        msg.textContent = '';
+      } else {
+        msg.textContent = '❌ Nesprávný kód';
+      }
+    }
+
+    function adminLogin() {
+      const pass = document.getElementById('adminPassword').value.trim();
+      const msg = document.getElementById('adminMsg');
+      if(pass === 'p666pr'){
+        msg.textContent = '✅ Přihlášeno';
+        document.getElementById('adminLoginBox').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('content').style.display = 'block';
+      } else {
+        msg.textContent = '❌ Špatné heslo';
+      }
+    }
+
+    function logoutAdmin() {
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('adminMsg').textContent = '❌ Admin odhlášen';
+      document.getElementById('adminLoginBox').style.display = 'block';
+      document.getElementById('adminPassword').value = '';
+    }
+
+    function changeCode() {
+      const newCode = document.getElementById('newCode').value.trim();
+      const codeMsg = document.getElementById('codeMsg');
+      if(newCode.length < 4){
+        codeMsg.textContent = '❌ Kód musí mít alespoň 4 znaky';
+        return;
+      }
+      listenerCode = newCode;
+      localStorage.setItem('listenerCode', newCode);
+      document.getElementById('currentCode').textContent = newCode;
+      codeMsg.textContent = '✅ Kód změněn';
+    }
+
+    function updateInfo() {
+      const message = document.getElementById('adminMessage').value.trim();
+      const infoMsg = document.getElementById('infoMsg');
+      if(message.length === 0){
+        infoMsg.textContent = '❌ Zpráva nesmí být prázdná';
+        return;
+      }
+      localStorage.setItem('infoText', message);
+      document.getElementById('infoPanel').innerHTML = '<p>' + message + '</p>';
+      infoMsg.textContent = '✅ Info aktualizováno';
+    }
+
+    function deleteInfo() {
+      localStorage.removeItem('infoText');
+      document.getElementById('infoPanel').innerHTML = '<p></p>';
+      document.getElementById('infoMsg').textContent = '✅ Zpráva smazána';
+    }
+  </script>
+</body>
+</html>
