@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8" />
+<title>Privátní rádio přehrávač</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#f5f5f5; padding:20px; max-width: 450px; margin: auto; }
+  #loginForm, #adminLoginForm, #player, #adminPanel { margin-top: 20px; }
+  #player, #adminPanel, #adminLoginForm { display: none; }
+  input[type="password"] {
+    width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box;
+    font-size: 16px;
+  }
+  button {
+    padding: 10px 15px; font-size: 16px; cursor: pointer;
+    background-color: #2d89ef; color: white; border: none;
+    border-radius: 4px;
+  }
+  button:hover { background-color: #1b5fab; }
+  p.message { color: red; }
+  p.success { color: green; }
+  a { cursor: pointer; color: #2d89ef; text-decoration: underline; }
+  h1,h2 { text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>Privátní rádio přehrávač</h1>
+
+<div id="loginForm">
+  <label>Zadejte heslo pro vstup:</label>
+  <input type="password" id="userPasswordInput" autocomplete="off" />
+  <button onclick="userLogin()">Přihlásit se</button>
+  <p class="message" id="loginMessage"></p>
+  <p style="text-align:center; font-size: 14px;">
+    Jste admin? <a onclick="showAdminLogin()">Přihlásit se jako admin</a>
+  </p>
+</div>
+
+<div id="adminLoginForm">
+  <label>Zadejte admin heslo:</label>
+  <input type="password" id="adminPasswordInput" autocomplete="off" />
+  <button onclick="adminLogin()">Přihlásit se jako admin</button>
+  <p class="message" id="adminLoginMessage"></p>
+  <p style="text-align:center; font-size: 14px;">
+    <a onclick="showUserLogin()">Zpět k uživateli</a>
+  </p>
+</div>
+
+<div id="player">
+  <h2>Poslouchejte rádio</h2>
+  <audio controls autoplay style="width: 100%;">
+    <source id="audioSource" src="" type="audio/mpeg" />
+    Váš prohlížeč nepodporuje audio.
+  </audio>
+  <p style="text-align:center;"><button onclick="logout()">Odhlásit se</button></p>
+</div>
+
+<div id="adminPanel">
+  <h2>Admin panel - změna uživatelského hesla</h2>
+  <label>Nové uživatelské heslo:</label>
+  <input type="password" id="newUserPasswordInput" autocomplete="off" />
+  <button onclick="changeUserPassword()">Změnit heslo</button>
+  <p class="message" id="adminMessage"></p>
+  <p style="text-align:center;"><button onclick="logout()">Odhlásit se</button></p>
+</div>
+
+<script>
+  // Výchozí hesla
+  const defaultUserPassword = '321456';
+  const adminPassword = 'p666pr';
+
+  // Stream URL zakódovaný base64
+  // Originální: http://s38.myradiostream.com:16686/
+  const streamBase64 = 'aHR0cDovL3MzOC5teXJhZGlvc3RyZWFtLmNvbToxNjY4Ni8=';
+
+  // Načteme uložené heslo uživatele z localStorage nebo použijeme výchozí
+  let userPassword = localStorage.getItem('userPassword') || defaultUserPassword;
+
+  let loggedIn = false;
+  let isAdmin = false;
+
+  function base64Decode(str) {
+    try {
+      return decodeURIComponent(atob(str).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+    } catch(e) {
+      return atob(str);
+    }
+  }
+
+  function showUserLogin() {
+    clearMessages();
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('adminLoginForm').style.display = 'none';
+    document.getElementById('player').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    loggedIn = false;
+    isAdmin = false;
+  }
+
+  function showAdminLogin() {
+    clearMessages();
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('adminLoginForm').style.display = 'block';
+    document.getElementById('player').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    loggedIn = false;
+    isAdmin = false;
+  }
+
+  function clearMessages() {
+    document.getElementById('loginMessage').textContent = '';
+    document.getElementById('adminLoginMessage').textContent = '';
+    document.getElementById('adminMessage').textContent = '';
+  }
+
+  function userLogin() {
+    clearMessages();
+    const input = document.getElementById('userPasswordInput').value.trim();
+    if(input === userPassword) {
+      loggedIn = true;
+      isAdmin = false;
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('player').style.display = 'block';
+
+      // Nastav zdroj audio streamu
+      document.getElementById('audioSource').src = base64Decode(streamBase64);
+      const audioElem = document.querySelector('audio');
+      audioElem.load();
+
+      // Pokus spustit audio, pokud zablokováno, upozorni uživatele
+      setTimeout(() => {
+        audioElem.play().catch(() => {
+          document.getElementById('loginMessage').textContent = 'Klikněte prosím na tlačítko přehrávání rádia.';
+        });
+      }, 100);
+    } else {
+      document.getElementById('loginMessage').textContent = 'Špatné heslo.';
+    }
+  }
+
+  function adminLogin() {
+    clearMessages();
+    const input = document.getElementById('adminPasswordInput').value.trim();
+    if(input === adminPassword) {
+      loggedIn = true;
+      isAdmin = true;
+      document.getElementById('adminLoginForm').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+    } else {
+      document.getElementById('adminLoginMessage').textContent = 'Špatné admin heslo.';
+    }
+  }
+
+  function changeUserPassword() {
+    clearMessages();
+    if(!isAdmin) return;
+
+    const newPass = document.getElementById('newUserPasswordInput').value.trim();
+    if(newPass.length < 4) {
+      document.getElementById('adminMessage').style.color = 'red';
+      document.getElementById('adminMessage').textContent = 'Heslo musí mít alespoň 4 znaky.';
+      return;
+    }
+
+    userPassword = newPass;
+    localStorage.setItem('userPassword', newPass);
+
+    document.getElementById('adminMessage').style.color = 'green';
+    document.getElementById('adminMessage').textContent = 'Uživatelské heslo bylo změněno.';
+    document.getElementById('newUserPasswordInput').value = '';
+  }
+
+  function logout() {
+    loggedIn = false;
+    isAdmin = false;
+    document.getElementById('player').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    showUserLogin();
+  }
+
+  // Startovací zobrazení
+  showUserLogin();
+</script>
+
+</body>
+</html>
