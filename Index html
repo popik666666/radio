@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎧 Popik666 Rádio</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    .icon {
+      font-size: 32px;
+      cursor: pointer;
+      user-select: none;
+      color: #ff4444;
+      transition: 0.3s;
+    }
+    .icon:hover {
+      transform: scale(1.2);
+    }
+    #loginBox, #adminPanel, #playerBox {
+      display: none;
+      background: #222;
+      padding: 1em;
+      border-radius: 10px;
+      max-width: 320px;
+      margin: 2em auto;
+    }
+    input, button {
+      padding: 0.6em;
+      margin: 0.5em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+    button {
+      background: #ff4444;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff6666;
+    }
+  </style>
+</head>
+<body>
+  <div class="icon" onclick="toggleLogin()">🔑</div>
+
+  <div id="loginBox">
+    <h3>🎧 Přihlášení posluchače</h3>
+    <input type="password" id="listenerPass" placeholder="Zadej heslo"><br>
+    <button onclick="checkListener()">Přihlásit</button>
+    <p id="listenerMsg"></p>
+    <hr>
+    <h4>🔐 Admin přihlášení</h4>
+    <input type="password" id="adminPass" placeholder="Admin kód"><br>
+    <button onclick="checkAdmin()">Přihlásit jako admin</button>
+    <p id="adminMsg"></p>
+  </div>
+
+  <div id="adminPanel">
+    <h3>🔧 Změna hesla posluchače</h3>
+    <input type="password" id="newPass" placeholder="Nové heslo"><br>
+    <button onclick="changePass()">Změnit heslo</button>
+    <p id="changeMsg"></p>
+    <button onclick="logoutAdmin()">Odhlásit admina</button>
+  </div>
+
+  <div id="playerBox">
+    <h2>🎶 Popik666 Rádio</h2>
+    <script src="//myradiostream.com/embed/Popik666"></script>
+    <br>
+    <button onclick="logout()">Odhlásit posluchače</button>
+  </div>
+
+  <script>
+    const defaultListenerPass = "321456";
+    const adminCode = "p666pr";
+
+    // Načti heslo z localStorage nebo použij výchozí
+    let listenerPass = localStorage.getItem("listenerPass") || defaultListenerPass;
+
+    function toggleLogin() {
+      const box = document.getElementById("loginBox");
+      box.style.display = box.style.display === "block" ? "none" : "block";
+    }
+
+    function checkListener() {
+      const pass = document.getElementById("listenerPass").value.trim();
+      const msg = document.getElementById("listenerMsg");
+      if (pass === listenerPass) {
+        msg.textContent = "✅ Přístup povolen.";
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("playerBox").style.display = "block";
+      } else {
+        msg.textContent = "❌ Nesprávné heslo.";
+      }
+    }
+
+    function checkAdmin() {
+      const pass = document.getElementById("adminPass").value.trim();
+      const msg = document.getElementById("adminMsg");
+      if (pass === adminCode) {
+        msg.textContent = "✅ Admin přihlášen.";
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+      } else {
+        msg.textContent = "❌ Nesprávný admin kód.";
+      }
+    }
+
+    function changePass() {
+      const newPass = document.getElementById("newPass").value.trim();
+      const msg = document.getElementById("changeMsg");
+      if (newPass.length < 4) {
+        msg.textContent = "❌ Heslo musí mít alespoň 4 znaky.";
+        return;
+      }
+      listenerPass = newPass;
+      localStorage.setItem("listenerPass", listenerPass);
+      msg.textContent = "✅ Heslo změněno.";
+      document.getElementById("newPass").value = "";
+    }
+
+    function logout() {
+      document.getElementById("playerBox").style.display = "none";
+    }
+
+    function logoutAdmin() {
+      document.getElementById("adminPanel").style.display = "none";
+    }
+  </script>
+</body>
+</html>
