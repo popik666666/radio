@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Radio Stream</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    input, button {
+      padding: 0.5em;
+      margin: 0.5em;
+      font-size: 1em;
+    }
+    button {
+      background: #444;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    audio {
+      margin-top: 2em;
+      width: 90%;
+      max-width: 600px;
+    }
+    #playerPanel, #adminPanel, #adminLogin {
+      display: none;
+      margin-top: 2em;
+    }
+    #adminKey {
+      font-size: 1.5em;
+      cursor: pointer;
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 My Radio Stream</h1>
+
+  <!-- Přihlášení posluchače -->
+  <div id="loginSection">
+    <h2>Přihlášení posluchače</h2>
+    <input type="password" id="listenerPass" placeholder="Zadej heslo" />
+    <button onclick="loginListener()">Přihlásit</button>
+    <p id="loginMessage"></p>
+    <div id="adminKey" onclick="showAdminLogin()">🔑</div>
+  </div>
+
+  <!-- Admin přihlášení -->
+  <div id="adminLogin">
+    <h2>Admin přihlášení</h2>
+    <input type="password" id="adminPass" placeholder="Zadej admin heslo" />
+    <button onclick="loginAdmin()">Přihlásit jako admin</button>
+    <p id="adminLoginMessage"></p>
+  </div>
+
+  <!-- Přehrávač -->
+  <div id="playerPanel">
+    <h2>🎶 Poslouchej živě</h2>
+    <audio controls autoplay>
+      <source src="http://5.135.154.91:16686/;" type="audio/mpeg">
+      Váš prohlížeč nepodporuje přehrávání audia.
+    </audio>
+    <br>
+    <button onclick="logout()">Odhlásit</button>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="adminPanel">
+    <h2>🔧 Admin Panel</h2>
+    <label for="newCode">Změnit heslo pro posluchače:</label><br>
+    <input type="text" id="newCode" />
+    <button onclick="changeCode()">Změnit heslo</button>
+    <p id="adminMessage"></p>
+    <button onclick="logout()">Odhlásit</button>
+  </div>
+
+  <script>
+    let listenerPassword = "322456"; // výchozí heslo
+
+    function loginListener() {
+      const pass = document.getElementById("listenerPass").value.trim();
+      const msg = document.getElementById("loginMessage");
+      if (pass === listenerPassword) {
+        msg.textContent = "✅ Přístup povolen.";
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("playerPanel").style.display = "block";
+      } else {
+        msg.textContent = "❌ Neplatné heslo.";
+      }
+    }
+
+    function showAdminLogin() {
+      document.getElementById("adminLogin").style.display = "block";
+    }
+
+    function loginAdmin() {
+      const pass = document.getElementById("adminPass").value.trim();
+      const msg = document.getElementById("adminLoginMessage");
+      if (pass === "p666pr") {
+        msg.textContent = "✅ Přihlášen jako admin.";
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("adminLogin").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+      } else {
+        msg.textContent = "❌ Neplatné admin heslo.";
+      }
+    }
+
+    function changeCode() {
+      const newCode = document.getElementById("newCode").value.trim();
+      if (newCode !== "") {
+        listenerPassword = newCode;
+        document.getElementById("adminMessage").textContent = "✅ Heslo změněno na: " + listenerPassword;
+      } else {
+        document.getElementById("adminMessage").textContent = "❌ Zadej platné heslo.";
+      }
+    }
+
+    function logout() {
+      document.getElementById("loginSection").style.display = "block";
+      document.getElementById("playerPanel").style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
+      document.getElementById("adminLogin").style.display = "none";
+      document.getElementById("listenerPass").value = "";
+      document.getElementById("adminPass").value = "";
+      document.getElementById("newCode").value = "";
+      document.getElementById("loginMessage").textContent = "";
+      document.getElementById("adminLoginMessage").textContent = "";
+      document.getElementById("adminMessage").textContent = "";
+    }
+  </script>
+</body>
+</html>
