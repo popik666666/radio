@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Popik666 Rádio 🎧</title>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    h1 {
+      color: #ff4444;
+      text-shadow: 0 0 10px #ff0000;
+    }
+    input, button {
+      padding: 0.6em;
+      margin: 0.5em;
+      font-size: 1em;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    button {
+      background: #ff4444;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ff6666;
+    }
+    audio {
+      margin-top: 2em;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 10px;
+    }
+    #playerPanel, #adminPanel {
+      display: none;
+      margin-top: 2em;
+      background: #1b1b1b;
+      padding: 1.5em;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 Popik666 Rádio</h1>
+
+  <!-- Přihlášení -->
+  <div id="loginSection">
+    <h2>🔐 Přihlášení</h2>
+    <input type="text" id="username" placeholder="Uživatelské jméno" /><br>
+    <input type="password" id="password" placeholder="Heslo" /><br>
+    <button onclick="login()">Přihlásit</button>
+    <p id="loginMessage"></p>
+  </div>
+
+  <!-- Přehrávač -->
+  <div id="playerPanel">
+    <h2>🎶 Poslouchej živě</h2>
+    <audio id="radioPlayer" controls autoplay>
+      <source src="http://s38.myradiostream.com:16686/" type="audio/mpeg">
+      Váš prohlížeč nepodporuje přehrávání audia.
+    </audio>
+    <br>
+    <button onclick="logout()">Odhlásit</button>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="adminPanel">
+    <h2>⚙️ Admin Panel</h2>
+    <label for="newCode">Změnit heslo pro posluchače:</label><br>
+    <input type="text" id="newCode" placeholder="Nové heslo..." />
+    <button onclick="changeCode()">Změnit heslo</button>
+    <p id="adminMessage"></p>
+    <button onclick="logout()">Odhlásit</button>
+  </div>
+
+  <script>
+    // Načtení hesla z localStorage nebo výchozí
+    let listenerPassword = localStorage.getItem("listenerPassword") || "321456";
+
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const msg = document.getElementById("loginMessage");
+
+      if (user === "popik" && pass === "p666pr") {
+        msg.textContent = "✅ Přihlášen jako admin.";
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+      } else if (pass === listenerPassword) {
+        msg.textContent = "✅ Přístup povolen.";
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("playerPanel").style.display = "block";
+        document.getElementById("radioPlayer").play().catch(() => {});
+      } else {
+        msg.textContent = "❌ Neplatné přihlašovací údaje.";
+      }
+    }
+
+    function logout() {
+      document.getElementById("loginSection").style.display = "block";
+      document.getElementById("playerPanel").style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("newCode").value = "";
+      document.getElementById("loginMessage").textContent = "";
+      document.getElementById("adminMessage").textContent = "";
+    }
+
+    function changeCode() {
+      const newCode = document.getElementById("newCode").value.trim();
+      if (newCode !== "") {
+        listenerPassword = newCode;
+        localStorage.setItem("listenerPassword", listenerPassword);
+        document.getElementById("adminMessage").textContent = "✅ Heslo změněno na: " + listenerPassword;
+      } else {
+        document.getElementById("adminMessage").textContent = "❌ Zadej platné heslo.";
+      }
+    }
+  </script>
+</body>
+</html>
