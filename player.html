@@ -1,0 +1,184 @@
+<!doctype html>
+
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Popik666 — Secure Web Player</title>
+  <style>
+    :root{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    body{display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0f172a;color:#e6eef8}
+    .card{width:100%;max-width:720px;padding:20px;border-radius:12px;background:linear-gradient(180deg,#081029 0%, #081a2a 100%);box-shadow:0 10px 30px rgba(2,6,23,.6)}
+    h1{margin:0 0 6px;font-size:20px}
+    p.small{margin:0 0 18px;color:#9fb0d0}
+    .player-row{display:flex;gap:12px;align-items:center}
+    audio{width:100%}
+    .controls{display:flex;gap:8px;align-items:center}
+    .btn{background:#14426a;padding:8px 12px;border-radius:8px;border:0;color:white;cursor:pointer}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,.06)}
+    label{font-size:13px;color:#9fb0d0}
+    input[type="text"],input[type="password"]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:inherit}
+    .row{display:flex;gap:8px}
+    .muted{color:#789}
+    .admin-panel{margin-top:14px;border-top:1px dashed rgba(255,255,255,.03);padding-top:12px}
+    .note{font-size:12px;color:#88a}
+  </style>
+</head>
+<body>
+  <div class="card" id="app">
+    <h1>Popik666 — zabezpečený přehrávač</h1>
+    <p class="small">Jednoduchý webový přehrávač se zámkem pro posluchače a administrací (client‑side). Uloží nastavení do <code>localStorage</code>.</p><div id="loginArea">
+  <label for="listenPassword">Zadej heslo pro poslech</label>
+  <div class="row" style="margin-top:8px">
+    <input id="listenPassword" type="password" placeholder="Heslo pro posluchače">
+    <button id="btnEnter" class="btn">Poslouchat</button>
+  </div>
+  <p class="note">Výchozí heslo pro posluchače: <strong id="defaultListen">321456</strong></p>
+</div>
+
+<div id="playerArea" style="display:none;">
+  <div class="player-row">
+    <div style="flex:1">
+      <label>Aktuální stream URL</label>
+      <input id="streamUrl" type="text" placeholder="Stream URL (mp3/ogg)" />
+      <p class="note">Příklad: http://s38.myradiostream.com:16686/</p>
+    </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <audio id="audio" controls preload="none">
+      <source id="audioSource">
+      Váš prohlížeč nepodporuje audio element.
+    </audio>
+  </div>
+
+  <div class="controls" style="margin-top:10px">
+    <button id="btnPlay" class="btn">Přehrát</button>
+    <button id="btnPause" class="btn secondary">Pozastavit</button>
+    <button id="btnLogout" class="btn secondary">Odhlásit</button>
+    <button id="btnAdmin" class="btn">Administrace</button>
+    <button id="btnSave" class="btn">Uložit nastavení</button>
+  </div>
+
+  <div class="admin-panel" id="adminPanel" style="display:none;">
+    <h3 style="margin:6px 0">Admin panel</h3>
+    <label>Heslo administrátora</label>
+    <input id="adminPassword" type="password" placeholder="Admin heslo">
+    <label style="margin-top:8px">Nastav nové heslo pro posluchače</label>
+    <input id="newListenPwd" type="password" placeholder="Nové heslo pro posluchače">
+    <div class="row" style="margin-top:8px">
+      <button id="btnApply" class="btn">Uložit změny</button>
+      <button id="btnCloseAdmin" class="btn secondary">Zavřít</button>
+    </div>
+    <p class="note" style="margin-top:8px">Výchozí admin heslo: <strong id="defaultAdmin">p666rp</strong></p>
+  </div>
+
+</div>
+
+<p style="margin-top:12px;color:#7f9bb7">Tip: uložit tento soubor jako <code>player.html</code> a nahrát na GitHub Pages nebo jiný statický host.</p>
+
+  </div>  <script>
+    // --- Defaults ---
+    const DEFAULTS = {
+      streamUrl: 'http://s38.myradiostream.com:16686/',
+      listenPwd: '321456',
+      adminPwd: 'p666rp'
+    };
+
+    // Load config from localStorage or defaults
+    function loadConfig(){
+      try{
+        const cfg = JSON.parse(localStorage.getItem('popik_cfg')||'{}');
+        return Object.assign({}, DEFAULTS, cfg);
+      }catch(e){return Object.assign({}, DEFAULTS);}    
+    }
+    function saveConfig(cfg){ localStorage.setItem('popik_cfg', JSON.stringify(cfg)); }
+
+    const audio = document.getElementById('audio');
+    const audioSource = document.getElementById('audioSource');
+    const streamUrlInput = document.getElementById('streamUrl');
+    const listenPasswordInput = document.getElementById('listenPassword');
+
+    let cfg = loadConfig();
+
+    // populate fields
+    document.getElementById('defaultListen').textContent = cfg.listenPwd;
+    document.getElementById('defaultAdmin').textContent = cfg.adminPwd;
+    streamUrlInput.value = cfg.streamUrl;
+
+    function setStream(url){
+      audio.pause();
+      audioSource.src = url;
+      audio.load();
+    }
+
+    // Login flow for listener
+    document.getElementById('btnEnter').addEventListener('click', ()=>{
+      const entered = listenPasswordInput.value;
+      if(entered === cfg.listenPwd){
+        document.getElementById('loginArea').style.display='none';
+        document.getElementById('playerArea').style.display='block';
+        setStream(cfg.streamUrl);
+      } else {
+        alert('Špatné heslo pro poslech.');
+      }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', ()=>{
+      // stop
+      audio.pause();
+      audio.currentTime=0;
+      document.getElementById('playerArea').style.display='none';
+      document.getElementById('loginArea').style.display='block';
+      listenPasswordInput.value='';
+    });
+
+    // Play / Pause
+    document.getElementById('btnPlay').addEventListener('click', ()=> audio.play());
+    document.getElementById('btnPause').addEventListener('click', ()=> audio.pause());
+
+    // Save changes
+    document.getElementById('btnSave').addEventListener('click', ()=>{
+      cfg.streamUrl = streamUrlInput.value || cfg.streamUrl;
+      saveConfig(cfg);
+      setStream(cfg.streamUrl);
+      alert('Nastavení uloženo do prohlížeče.');
+    });
+
+    // Admin
+    const adminPanel = document.getElementById('adminPanel');
+    document.getElementById('btnAdmin').addEventListener('click', ()=>{
+      // prompt for admin password
+      const attempt = prompt('Zadej admin heslo pro přístup do administrace:');
+      if(attempt === cfg.adminPwd){
+        adminPanel.style.display='block';
+        document.getElementById('adminPassword').value = '';
+      } else {
+        alert('Špatné admin heslo.');
+      }
+    });
+
+    document.getElementById('btnCloseAdmin').addEventListener('click', ()=>{ adminPanel.style.display='none'; });
+
+    document.getElementById('btnApply').addEventListener('click', ()=>{
+      const newAdmin = document.getElementById('adminPassword').value.trim();
+      const newListen = document.getElementById('newListenPwd').value.trim();
+      if(newAdmin){ cfg.adminPwd = newAdmin; }
+      if(newListen){ cfg.listenPwd = newListen; }
+      // also allow changing live stream URL here
+      const urlFromInput = streamUrlInput.value.trim();
+      if(urlFromInput) cfg.streamUrl = urlFromInput;
+      saveConfig(cfg);
+      document.getElementById('defaultAdmin').textContent = cfg.adminPwd;
+      document.getElementById('defaultListen').textContent = cfg.listenPwd;
+      alert('Změny uloženy.');
+      adminPanel.style.display='none';
+    });
+
+    // Initialize audio source if already logged in (rare)
+    setStream(cfg.streamUrl);
+
+    // Security note: this is a client-side protection only.
+    // Anyone with access to the HTML can read the defaults. For strong security use server-side auth.
+  </script></body>
+</html>
