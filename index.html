@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Popik666 Rádio - Přístup s heslem</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101a2b;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .container {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+    }
+    button {
+      background: #14426a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1c5c90;
+    }
+    #playerSection {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginSection">
+    <h1>Popik666 Rádio</h1>
+    <p>Zadej heslo pro vstup:</p>
+    <input type="password" id="passwordInput" placeholder="Heslo" />
+    <button id="loginBtn">Vstoupit</button>
+    <p style="font-size: 12px; color: #aaa; margin-top: 10px;">Výchozí heslo: <strong>321456</strong></p>
+  </div>
+
+  <div class="container" id="playerSection">
+    <h1>Popik666 Rádio LIVE 🔥</h1>
+    <div id="myradiostream-player"></div>
+    <button id="logoutBtn" style="margin-top:20px;">Odhlásit</button>
+  </div>
+
+  <script src="//myradiostream.com/embed/Popik666"></script>
+
+  <script>
+    const correctPassword = '321456';
+
+    const loginSection = document.getElementById('loginSection');
+    const playerSection = document.getElementById('playerSection');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const passwordInput = document.getElementById('passwordInput');
+
+    loginBtn.addEventListener('click', () => {
+      if(passwordInput.value === correctPassword) {
+        loginSection.style.display = 'none';
+        playerSection.style.display = 'block';
+      } else {
+        alert('Špatné heslo!');
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      playerSection.style.display = 'none';
+      loginSection.style.display = 'block';
+      passwordInput.value = '';
+    });
+
+    passwordInput.addEventListener('keyup', e => {
+      if(e.key === 'Enter') loginBtn.click();
+    });
+  </script>
+</body>
+</html>
