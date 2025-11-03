@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Popik666 Rádio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    #loginSection, #mainSection {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      font-size: 16px;
+      text-align: center;
+      background: #111;
+      color: #eee;
+    }
+
+    button {
+      background: #14426a;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+      transition: background 0.3s ease;
+    }
+
+    button:hover { background: #1c5c90; }
+
+    #adminIcon {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      display: none; /* skrytý dokud není admin */
+    }
+
+    #adminPanel {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 15px;
+      background: rgba(0,0,0,0.9);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+      text-align: left;
+      width: 220px;
+      z-index: 10;
+    }
+
+    #adminPanel input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      background: #222;
+      color: #eee;
+    }
+
+    audio {
+      margin-top: 15px;
+      width: 100%;
+      outline: none;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 255, 0.7);
+      background: #111;
+    }
+
+    @media screen and (max-width: 600px) {
+      #adminPanel { position: static; margin: 15px auto; width: auto; }
+      #adminIcon { position: static; display: block; margin: 10px auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginSection">
+    <h1>🎧 Popik666 Rádio</h1>
+    <p>Zadej heslo pro vstup:</p>
+    <input type="password" id="passwordInput" placeholder="Heslo" autocomplete="off" />
+    <button id="loginBtn">Přihlásit</button>
+  </div>
+
+  <div id="mainSection" style="display:none;">
+    <div id="adminIcon" title="Admin panel">🔑</div>
+    <div id="adminPanel">
+      <h3>Admin panel</h3>
+      <input type="password" id="newPass" placeholder="Nové uživatelské heslo" autocomplete="off" />
+      <button id="savePass">Uložit</button>
+      <button id="logoutBtn">Odhlásit</button>
+    </div>
+
+    <!-- Audio přehrávač -->
+    <audio controls autoplay>
+      <source src="http://s38.myradiostream.com:16686/stream" type="audio/mpeg" />
+      Tvůj prohlížeč nepodporuje přehrávání audia.
+    </audio>
+  </div>
+
+  <script>
+    const loginBtn = document.getElementById('loginBtn');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginSection = document.getElementById('loginSection');
+    const mainSection = document.getElementById('mainSection');
+    const adminIcon = document.getElementById('adminIcon');
+    const adminPanel = document.getElementById('adminPanel');
+    const savePass = document.getElementById('savePass');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const newPassInput = document.getElementById('newPass');
+
+    let userPass = "321456";
+    const adminPass = "p666pr";
+
+    adminIcon.style.display = "none";
+
+    loginBtn.onclick = () => {
+      const input = passwordInput.value.trim();
+      if (input === userPass || input === adminPass) {
+        loginSection.style.display = "none";
+        mainSection.style.display = "block";
+        if (input === adminPass) {
+          adminIcon.style.display = "block";
+        } else {
+          adminIcon.style.display = "none";
+          adminPanel.style.display = "none";
+        }
+        passwordInput.value = "";
+      } else {
+        alert("Špatné heslo!");
+      }
+    };
+
+    passwordInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    adminIcon.onclick = () => {
+      adminPanel.style.display = adminPanel.style.display === "none" ? "block" : "none";
+    };
+
+    savePass.onclick = () => {
+      const newPass = newPassInput.value.trim();
+      if (newPass) {
+        userPass = newPass;
+        alert("Uživatelské heslo bylo změněno!");
+        newPassInput.value = "";
+      } else {
+        alert("Zadej nové heslo!");
+      }
+    };
+
+    logoutBtn.onclick = () => {
+      mainSection.style.display = "none";
+      loginSection.style.display = "block";
+      adminPanel.style.display = "none";
+      adminIcon.style.display = "none";
+      passwordInput.value = "";
+    };
+  </script>
+
+</body>
+</html>
