@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <title>Popik666 Rádio - Shoutcast přehrávač</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    audio {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 12px;
+      outline: none;
+      box-shadow: 0 0 15px #1c5c90;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 Popik666 Rádio - Shoutcast přehrávač</h1>
+
+  <!-- Přehraj přes doménu -->
+  <audio controls autoplay>
+    <source src="http://s38.myradiostream.com:16686/;" type="audio/mpeg" />
+    Váš prohlížeč nepodporuje přehrávání audia.
+  </audio>
+
+  <br><br>
+
+  <!-- Přehraj přes IP -->
+  <audio controls>
+    <source src="http://5.135.154.91:16686/;" type="audio/mpeg" />
+    Váš prohlížeč nepodporuje přehrávání audia.
+  </audio>
+
+</body>
+</html>
