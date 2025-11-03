@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <title>Popik666 Rádio - Přihlášení a admin panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      box-sizing: border-box;
+    }
+
+    #loginSection {
+      max-width: 400px;
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      font-size: 18px;
+      text-align: center;
+      background: #111;
+      color: #eee;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #14426a;
+      border: none;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      margin: 5px 0;
+      transition: background 0.3s;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 300px;
+    }
+    button:hover {
+      background: #1c5c90;
+    }
+
+    #mainSection {
+      display: none;
+      width: 100%;
+      max-width: 700px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      padding: 20px;
+      box-sizing: border-box;
+      position: relative;
+      text-align: center;
+    }
+
+    #audioPlayer {
+      width: 100%;
+      outline: none;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #1c5c90;
+      height: 40px;
+      appearance: none;
+      -webkit-appearance: none;
+      background: #111;
+    }
+
+    /* Admin ikona vpravo nahoře */
+    #adminIcon {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      font-size: 26px;
+      cursor: pointer;
+      user-select: none;
+      color: #1c5c90;
+      background: rgba(0,0,0,0.7);
+      padding: 8px 12px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #1c5c90;
+      z-index: 1000;
+      transition: background 0.3s, color 0.3s;
+    }
+    #adminIcon:hover {
+      background: #1c5c90;
+      color: #000;
+    }
+
+    /* Admin panel – skrytý, vyskočí po kliknutí */
+    #adminPanel {
+      position: fixed;
+      top: 60px;
+      right: 15px;
+      width: 320px;
+      background: rgba(0,0,0,0.9);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 20px #1c5c90;
+      display: none;
+      z-index: 1000;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    #adminPanel input[type="password"] {
+      margin-bottom: 15px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #111;
+      color: #eee;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    #adminPanel button {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    #logoutBtnAdmin {
+      background: #a00;
+      font-weight: bold;
+    }
+
+    /* Pro mobilní zařízení */
+    @media screen and (max-width: 600px) {
+      body {
+        padding: 20px 10px;
+      }
+      #loginSection {
+        max-width: 100%;
+        padding: 15px;
+      }
+      input[type="password"] {
+        font-size: 16px;
+        padding: 10px;
+      }
+      button {
+        font-size: 16px;
+        max-width: 100%;
+        padding: 10px;
+      }
+      #mainSection {
+        max-width: 100%;
+        padding: 15px;
+      }
+      #audioPlayer {
+        height: 45px;
+      }
+      #adminIcon {
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        padding: 6px 10px;
+      }
+      #adminPanel {
+        top: 50px;
+        right: 5%;
+        width: 90%;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Uživatelské přihlášení -->
+  <div id="loginSection">
+    <h1>🎧 Popik666 Rádio</h1>
+    <p>Zadej uživatelské heslo pro vstup:</p>
+    <input type="password" id="userPassInput" placeholder="Uživatelské heslo" autocomplete="off" />
+    <button id="userLoginBtn">Přihlásit</button>
+  </div>
+
+  <!-- Hlavní sekce s přehrávačem -->
+  <div id="mainSection">
+    <audio id="audioPlayer" controls autoplay>
+      <source src="http://s38.myradiostream.com:16686/;" type="audio/mpeg" />
+      Váš prohlížeč nepodporuje přehrávání audia.
+    </audio>
+  </div>
+
+  <!-- Admin ikona -->
+  <div id="adminIcon" title="Admin přihlášení">🔑</div>
+
+  <!-- Admin panel -->
+  <div id="adminPanel">
+    <p><strong>Admin přihlášení</strong></p>
+    <input type="password" id="adminPassInput" placeholder="Admin heslo" autocomplete="off" />
+    <button id="adminLoginBtn">Přihlásit jako admin</button>
+    <button id="logoutBtnAdmin" style="display:none;">Odhlásit admina</button>
+
+    <hr style="border-color:#1c5c90;" />
+
+    <div id="adminControls" style="display:none;">
+      <p><strong>Změna uživatelského hesla:</strong></p>
+      <input type="password" id="newUserPass" placeholder="Nové uživatelské heslo" autocomplete="off" />
+      <button id="saveUserPassBtn">Uložit nové heslo</button>
+    </div>
+  </div>
+
+<script>
+  const userLoginBtn = document.getElementById('userLoginBtn');
+  const userPassInput = document.getElementById('userPassInput');
+  const loginSection = document.getElementById('loginSection');
+  const mainSection = document.getElementById('mainSection');
+
+  const adminIcon = document.getElementById('adminIcon');
+  const adminPanel = document.getElementById('adminPanel');
+  const adminPassInput = document.getElementById('adminPassInput');
+  const adminLoginBtn = document.getElementById('adminLoginBtn');
+  const logoutBtnAdmin = document.getElementById('logoutBtnAdmin');
+  const adminControls = document.getElementById('adminControls');
+  const newUserPassInput = document.getElementById('newUserPass');
+  const saveUserPassBtn = document.getElementById('saveUserPassBtn');
+
+  // Hesla
+  let userPass = "porapidiko";
+  const adminPass = "p666pr";
+
+  // Stav
+  let isUserLoggedIn = false;
+  let isAdminLoggedIn = false;
+
+  // Přihlášení uživatele
+  userLoginBtn.onclick = () => {
+    const val = userPassInput.value.trim();
+    if(val === userPass) {
+      isUserLoggedIn = true;
+      loginSection.style.display = "none";
+      mainSection.style.display = "block";
+      userPassInput.value = "";
+      alert("Přihlášen jako uživatel.");
+    } else {
+      alert("Špatné uživatelské heslo!");
+    }
+  };
+
+  // Admin ikona klik
+  adminIcon.onclick = () => {
+    adminPanel.style.display = adminPanel.style.display === "block" ? "none" : "block";
+    adminPassInput.value = "";
+  };
+
+  // Přihlášení admina
+  adminLoginBtn.onclick = () => {
+    const val = adminPassInput.value.trim();
+    if(val === adminPass) {
+      isAdminLoggedIn = true;
+      adminPassInput.value = "";
+      alert("Přihlášen jako admin.");
+      adminControls.style.display = "block";
+      logoutBtnAdmin.style.display = "block";
+      adminLoginBtn.style.display = "none";
+      adminPassInput.style.display = "none";
+      adminPanel.style.display = "block";
+    } else {
+      alert("Špatné admin heslo!");
+    }
+  };
+
+  // Odhlášení admina
+  logoutBtnAdmin.onclick = () => {
+    isAdminLoggedIn = false;
+    adminControls.style.display = "none";
+    logoutBtnAdmin.style.display = "none";
+    adminLoginBtn.style.display = "block";
+    adminPassInput.style.display = "block";
+    adminPanel.style.display = "none";
+    alert("Admin odhlášen.");
+  };
+
+  // Uložení nového uživatelského hesla
+  saveUserPassBtn.onclick = () => {
+    const val = newUserPassInput.value.trim();
+    if(val) {
+      userPass = val;
+      alert("Uživatelské heslo změněno!");
+      newUserPassInput.value = "";
+    } else {
+      alert("Zadejte nové uživatelské heslo!");
+    }
+  };
+
+  // Klávesa Enter pro přihlášení uživatele
+  userPassInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+      userLoginBtn.click();
+    }
+  });
+
+  // Klávesa Enter pro přihlášení admina
+  adminPassInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+      adminLoginBtn.click();
+    }
+  });
+</script>
+
+</body>
+</html>
